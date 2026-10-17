@@ -1,395 +1,164 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bank Prep Tracker</title>
-<style>
-:root{--bg:#0b1020;--panel:#131b31;--panel2:#18233e;--text:#eef3ff;--muted:#9eabc7;--line:#293653;--cyan:#45d6d0;--purple:#a78bfa;--pink:#fb7185;--yellow:#fbbf24;--green:#4ade80}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#1b2850 0,transparent 35%),var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
-header{padding:24px clamp(16px,4vw,44px) 18px;border-bottom:1px solid var(--line);background:#0b1020d9;position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}
-.top{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}.brand{font-size:clamp(22px,3vw,30px);font-weight:850;letter-spacing:-.7px}.brand span{color:var(--cyan)}.sub{color:var(--muted);margin-top:4px;font-size:13px}
-.exam-pill{border:1px solid #3b5478;background:#172747;padding:9px 13px;border-radius:999px;color:#d8e6ff;font-size:12px;font-weight:700}
-nav{display:flex;gap:8px;overflow:auto;padding-top:18px}.tab{background:transparent;color:var(--muted);border:1px solid transparent;border-radius:10px;padding:10px 13px;white-space:nowrap;cursor:pointer;font-weight:700}.tab.active{color:var(--text);background:var(--panel2);border-color:#344765}
-main{max-width:1400px;margin:auto;padding:24px clamp(14px,3vw,36px) 50px}.page{display:none}.page.active{display:block}.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:18px}.section-head h2{margin:0;font-size:24px}.muted{color:var(--muted)}.small{font-size:12px;color:var(--muted)}
-.grid{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin:18px 0}.card{background:linear-gradient(145deg,var(--panel),#10182b);border:1px solid var(--line);border-radius:17px;padding:18px;min-width:0}.stat-label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.7px}.stat-value{font-size:30px;font-weight:850;margin:7px 0 2px}.stat-note{font-size:12px;color:var(--muted)}.cyan{color:var(--cyan)}.purple{color:var(--purple)}.pink{color:var(--pink)}.yellow{color:var(--yellow)}
-.two{grid-template-columns:1.15fr .85fr}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.progress{height:9px;border-radius:20px;background:#27334d;overflow:hidden;margin:12px 0 5px}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:20px;transition:width .25s}
-.subject-row{margin:18px 0}.subject-line{display:flex;justify-content:space-between;gap:10px;font-weight:700}.subject-line span:last-child{color:var(--muted);font-size:12px}
-.btn{border:0;border-radius:10px;background:var(--cyan);color:#071321;font-weight:800;padding:10px 14px;cursor:pointer}.btn.secondary{background:#24314d;color:var(--text);border:1px solid #344765}.btn.danger{background:#482333;color:#ffc4d0;border:1px solid #784055}.btn.tiny{padding:6px 9px;font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px}input,select,textarea{width:100%;background:#0c1427;color:var(--text);border:1px solid #34415e;border-radius:10px;padding:11px 12px;font:inherit;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--cyan)}.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.field{min-width:0}.field.wide{grid-column:1/-1}.form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.toolbar input{max-width:300px}.toolbar select{max-width:200px}
-.topic-list{display:grid;gap:10px}.topic{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;background:#111a2e;border:1px solid var(--line);padding:14px;border-radius:13px}.topic h3{margin:0 0 4px;font-size:15px}.topic-meta{display:flex;gap:7px;flex-wrap:wrap}.tag{font-size:11px;border-radius:7px;padding:3px 7px;background:#24314d;color:#cbd7ef}.tag.done{background:#12392f;color:#8df3c0}.tag.progress-tag{background:#332b55;color:#d6c6ff}.topic-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:end}.empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed #3a4967;border-radius:13px}
-.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:640px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px}td strong{font-size:14px}.badge{padding:4px 8px;border-radius:7px;font-size:11px;font-weight:800;background:#273651}.badge.good{color:#9bf3c3;background:#12382e}.badge.mid{color:#fbd38d;background:#45351c}.badge.low{color:#ffb4c1;background:#45202e}
-.due-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.due-item:last-child{border-bottom:0}.due-item strong{display:block}.overdue{color:var(--pink)}.today{color:var(--yellow)}
-.checkline{display:flex;align-items:center;gap:9px;color:var(--text);font-size:13px}.checkline input{width:auto}
-footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#d9fff6;color:#09211e;padding:11px 16px;border-radius:12px;font-weight:800;box-shadow:0 10px 40px #0006;display:none;z-index:20}
-@media(max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}.three{grid-template-columns:1fr}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){header{position:relative}.stats{gap:9px}.card{padding:14px}.stat-value{font-size:25px}.form-grid{grid-template-columns:1fr}.topic{grid-template-columns:1fr}.topic-actions{justify-content:start}.section-head h2{font-size:21px}.exam-pill{white-space:normal}}
-</style>
-</head>
-<body>
-<header>
- <div class="top"><div><div class="brand">BANK PREP <span>TRACKER</span></div><div class="sub">Small daily wins. One strong result. • Your preparation command centre</div></div><div class="exam-pill">🎯 IBPS RRB CLERK • PRELIMS • 6 DEC 2026</div></div>
- <nav>
-  <button class="tab active" data-page="dashboard">⌂ Dashboard</button><button class="tab" data-page="syllabus">▤ Syllabus</button><button class="tab" data-page="lectures">▶ Quant Lectures</button><button class="tab" data-page="reasoning">🧠 Reasoning Lectures</button><button class="tab" data-page="english">📘 English Lectures</button><button class="tab" data-page="grammar">✍️ Grammar Granth</button><button class="tab" data-page="staticgk">🌍 Static GK</button><button class="tab" data-page="tests">◷ Tests & Scores</button><button class="tab" data-page="revision">↻ Revision</button><button class="tab" data-page="editorial">📰 Daily Editorial</button><button class="tab" data-page="todo">✅ To-do List</button><button class="tab" data-page="exams">📅 Exam Calendar</button><button class="tab" data-page="backup">⚙ Backup & Settings</button>
- </nav>
-</header>
-<main>
-<section id="dashboard" class="page active">
- <div class="section-head"><div><h2>Your preparation at a glance</h2><div class="muted">Track learning, practice, tests and revision in one place.</div></div><div class="actions"><button class="btn secondary" onclick="go('syllabus')">+ Update syllabus</button><button class="btn" onclick="go('tests')">+ Log a test</button></div></div>
- <div class="grid two" style="margin-bottom:14px"><div class="card" style="border-color:var(--cyan)"><div class="stat-label">⏳ LIVE EXAM COUNTDOWN</div><div id="heroCountdown" class="stat-value cyan" style="font-size:clamp(20px,3vw,30px)">Loading…</div><div id="heroExamName" class="stat-note">Next upcoming exam</div><div class="small">Updates every second using your device's local time.</div></div><div class="card" style="border-color:var(--yellow)"><div class="stat-label">🔥 DAILY STUDY STREAK</div><div id="streakCount" class="stat-value yellow">0 days</div><div id="streakMessage" class="stat-note">Complete a study action today to start your streak.</div><div id="streakCalendar" class="small" style="margin-top:8px"></div></div></div>
- <div class="card" style="margin-bottom:14px;border-color:var(--purple)">
-  <div class="section-head"><div><h3 style="margin:0">⏱ Focus Study Timer</h3><div class="small">Tracks focused study time on this device. Timer keeps running across refreshes.</div></div><div class="stat-value purple" id="timerDisplay" style="font-size:clamp(24px,4vw,34px);margin:0">00:00:00</div></div>
-  <div class="form-grid" style="align-items:end"><div class="field"><label for="timerSubject">Study subject</label><select id="timerSubject"><option>Quant</option><option>Reasoning</option><option>English</option><option>Grammar Granth</option><option>Static GK</option><option>Current Affairs</option><option>Revision</option><option>Mock Analysis</option><option>Other</option></select></div><div class="field"><label>Today's focused time</label><div class="stat-value cyan" id="todayStudyTime" style="font-size:24px;margin:0">0m</div></div><div class="field"><div class="actions"><button class="btn" id="timerStartBtn" onclick="startStudyTimer()">▶ Start</button><button class="btn secondary" id="timerPauseBtn" onclick="pauseStudyTimer()">Ⅱ Pause</button><button class="btn secondary" onclick="resetStudyTimer()">↺ Reset current</button></div></div></div>
-  <div class="small" id="timerStatus" style="margin-top:8px">Timer paused. Start when you begin focused study.</div><div id="studySessionLog" class="small" style="margin-top:8px"></div>
- </div>
- <div class="grid stats">
-  <div class="card"><div class="stat-label">Syllabus complete</div><div class="stat-value cyan" id="statSyllabus">0%</div><div class="stat-note" id="statTopics">0 of 0 topics completed</div><div class="progress"><div id="barSyllabus"></div></div></div>
-  <div class="card"><div class="stat-label">Tests attempted</div><div class="stat-value purple" id="statTests">0</div><div class="stat-note">Sectional tests and full mocks</div></div>
-  <div class="card"><div class="stat-label">Average accuracy</div><div class="stat-value yellow" id="statAccuracy">—</div><div class="stat-note">Across logged tests</div></div>
-  <div class="card"><div class="stat-label">Revisions due</div><div class="stat-value pink" id="statDue">0</div><div class="stat-note">Topics ready for review</div></div>
- </div>
- <div class="grid two">
-  <div class="card"><h3 style="margin-top:0">Syllabus progress by subject</h3><div id="subjectProgress"></div></div>
-  <div class="card"><h3 style="margin-top:0">Revision queue</h3><div class="muted small" style="margin-bottom:8px">Upcoming and overdue topic revisions</div><div id="dashboardDue"></div></div>
- </div>
- <div class="grid two" style="margin-top:14px">
-  <div class="card"><h3 style="margin-top:0">Latest test results</h3><div id="latestTests"></div></div>
-  <div class="card"><h3 style="margin-top:0">Today's focus</h3><div class="muted">Choose a few clear outcomes. Consistency matters more than a perfect timetable.</div><div style="display:grid;gap:12px;margin-top:14px" id="dailyChecks">
-   <label class="checkline"><input type="checkbox" data-daily="quant"> Quant practice completed</label>
-   <label class="checkline"><input type="checkbox" data-daily="reasoning"> Reasoning practice completed</label>
-   <label class="checkline"><input type="checkbox" data-daily="revision"> Revision completed</label>
-   <label class="checkline"><input type="checkbox" data-daily="analysis"> Test/error analysis completed</label>
-  </div><div class="small" style="margin-top:12px">Daily checklist resets automatically on a new date.</div></div>
- </div>
-</section>
 
-<section id="syllabus" class="page">
- <div class="section-head"><div><h2>Syllabus tracker</h2><div class="muted">Update each topic through Learn → Practice → PYQs → Revision.</div></div><button class="btn" onclick="showTopicForm()">+ Add topic</button></div>
- <div class="card" id="topicFormCard" style="display:none;margin-bottom:16px">
-  <h3 id="topicFormTitle" style="margin-top:0">Add a topic</h3><form id="topicForm"><input type="hidden" id="topicId"><div class="form-grid">
-   <div class="field"><label>Subject</label><select id="topicSubject"><option>Quant</option><option>Reasoning</option><option>English</option><option>General Awareness</option><option>Computer Awareness</option><option>Other</option></select></div>
-   <div class="field"><label>Topic name</label><input id="topicName" required placeholder="e.g. Simplification"></div>
-   <div class="field"><label>Priority</label><select id="topicPriority"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
-   <div class="field"><label>Learn status</label><select id="topicLearn"><option value="0">Not started</option><option value="1">In progress</option><option value="2">Done</option></select></div>
-   <div class="field"><label>Practice status</label><select id="topicPractice"><option value="0">Not started</option><option value="1">In progress</option><option value="2">Done</option></select></div>
-   <div class="field"><label>PYQs status</label><select id="topicPyq"><option value="0">Not started</option><option value="1">In progress</option><option value="2">Done</option></select></div>
-   <div class="field"><label>Next revision date</label><input type="date" id="topicNextRevision"></div>
-   <div class="field"><label>Questions solved</label><input type="number" id="topicQuestions" min="0" value="0"></div>
-   <div class="field"><label>Topic accuracy (%)</label><input type="number" id="topicAccuracy" min="0" max="100" placeholder="e.g. 85"></div>
-   <div class="field wide"><label>Notes / weak points</label><textarea id="topicNotes" rows="2" placeholder="Mistakes, formulas, doubts to revisit…"></textarea></div>
-  </div><div class="form-actions"><button class="btn" type="submit">Save topic</button><button class="btn secondary" type="button" onclick="hideTopicForm()">Cancel</button></div></form>
- </div>
- <div class="toolbar"><input id="topicSearch" placeholder="Search topics…" oninput="renderTopics()"><select id="subjectFilter" onchange="renderTopics()"><option value="All">All subjects</option><option>Quant</option><option>Reasoning</option><option>English</option><option>General Awareness</option><option>Computer Awareness</option><option>Other</option></select><select id="statusFilter" onchange="renderTopics()"><option value="All">All statuses</option><option value="Not started">Not started</option><option value="In progress">In progress</option><option value="Ready for revision">Ready for revision</option><option value="Completed">Completed</option></select></div>
- <div id="topicList" class="topic-list"></div>
-</section>
+/* Banking Planner: Supabase Cloud Sync */
+const CLOUD_CONFIG_KEY = "bankPrepSupabaseConfig_v1";
 
+let cloudClient = null;
+let cloudUser = null;
+let cloudReady = false;
+let cloudTimer = null;
 
-<section id="lectures" class="page">
- <div class="section-head"><div><h2>Quant lecture tracker</h2><div class="muted">20 topics total. DI is included in these topics, not counted separately.</div></div></div>
-
- <div class="grid stats">
-  <div class="card"><div class="stat-label">Topics completed</div><div class="stat-value cyan" id="lectureCount">0/20</div><div class="progress"><div id="lectureBar"></div></div><div class="stat-note" id="lectureHours">0 hours completed</div></div>
-  <div class="card"><div class="stat-label">Total estimated time</div><div class="stat-value purple">30–40h</div><div class="stat-note">20 topics × 90–120 minutes, estimate only</div></div>
-  <div class="card"><div class="stat-label">Topics remaining</div><div class="stat-value yellow" id="lectureRemaining">20</div><div class="stat-note">Tick each topic after completing its lecture</div></div>
-  <div class="card"><div class="stat-label">Time remaining estimate</div><div class="stat-value pink" id="lectureTimeLeft">30–40h</div><div class="stat-note">Based on 90–120 minutes per topic</div></div>
- </div>
- <div class="card"><div class="section-head"><div><h3 style="margin:0">Your 20 Quant topics</h3><div class="small">Lecture completion is separate from practice, PYQs and revision in the Syllabus tab.</div></div></div><div id="lectureList" class="topic-list"></div></div>
-</section>
-
-
-<section id="reasoning" class="page">
- <div class="section-head"><div><h2>Reasoning lecture tracker</h2><div class="muted">75 lectures total. DI is not counted separately.</div></div></div>
-
- <div class="grid stats">
-  <div class="card"><div class="stat-label">Lectures completed</div><div class="stat-value cyan" id="reasoningCount">0/75</div><div class="progress"><div id="reasoningBar"></div></div><div class="stat-note" id="reasoningHours">0 hours completed</div></div>
-  <div class="card"><div class="stat-label">Total estimated time</div><div class="stat-value purple">112.5–150h</div><div class="stat-note">75 lectures × 90–120 minutes</div></div>
-  <div class="card"><div class="stat-label">Lectures remaining</div><div class="stat-value yellow" id="reasoningRemaining">75</div><div class="stat-note">Mark each lecture complete after watching</div></div>
-  <div class="card"><div class="stat-label">Time remaining estimate</div><div class="stat-value pink" id="reasoningTimeLeft">112.5–150h</div><div class="stat-note">Based on 90–120 minutes per unfinished lecture</div></div>
- </div>
- <div class="card"><h3 style="margin-top:0">Reasoning topic overview</h3><div class="small" style="margin-bottom:12px">All your main topics are included below. Lecture counts per topic were not visible in the source, so the 75 lectures remain unassigned until you select the correct topic for each lecture. This avoids inventing lecture distributions.</div><div id="reasoningTopicSummary" class="topic-meta" style="margin-bottom:14px"></div><div class="toolbar"><select id="reasoningTopicFilter" onchange="renderReasoningLectures()"><option value="All">All topics</option></select><input id="reasoningSearch" placeholder="Search lecture / topic / notes" oninput="renderReasoningLectures()"></div><div id="reasoningList" class="topic-list"></div></div>
-</section>
-
-
-<section id="english" class="page">
- <div class="section-head"><div><h2>English — Perfection Batch</h2><div class="muted">73 videos • exactly 60 minutes each • lecture-only time is 73 hours.</div></div></div>
-
- <div class="grid stats">
-  <div class="card"><div class="stat-label">Videos completed</div><div class="stat-value cyan" id="englishCount">0/73</div><div class="progress"><div id="englishBar"></div></div><div class="stat-note" id="englishHours">0 of 73 hours completed</div></div>
-  <div class="card"><div class="stat-label">Total lecture time</div><div class="stat-value purple">73 hours</div><div class="stat-note">73 videos × 60 minutes exactly</div></div>
-  <div class="card"><div class="stat-label">Videos remaining</div><div class="stat-value yellow" id="englishRemaining">73</div><div class="stat-note">Mark each video complete after watching</div></div>
-  <div class="card"><div class="stat-label">Time remaining</div><div class="stat-value pink" id="englishTimeLeft">73h</div><div class="stat-note">Exact, based on remaining videos</div></div>
- </div>
- <div class="card"><h3 style="margin-top:0">English lecture checklist</h3><div class="small" style="margin-bottom:12px">I haven't assumed the exact topic names because you haven't shared the English topic list. You can rename each video and add notes.</div><div id="englishList" class="topic-list"></div></div>
-</section>
-
-
-<section id="staticgk" class="page">
- <div class="section-head"><div><h2>Static GK lecture tracker</h2><div class="muted">37 lectures • 60 minutes each • exact lecture time: 37 hours.</div></div></div>
-
- <div class="grid stats">
-  <div class="card"><div class="stat-label">Lectures completed</div><div class="stat-value cyan" id="gkCount">0/37</div><div class="progress"><div id="gkBar"></div></div><div class="stat-note" id="gkHours">0 of 37 hours completed</div></div>
-  <div class="card"><div class="stat-label">Total lecture time</div><div class="stat-value purple">37 hours</div><div class="stat-note">37 lectures × 60 minutes each</div></div>
-  <div class="card"><div class="stat-label">Lectures remaining</div><div class="stat-value yellow" id="gkRemaining">37</div><div class="stat-note">Mark each lecture after watching</div></div>
-  <div class="card"><div class="stat-label">Time remaining</div><div class="stat-value pink" id="gkTimeLeft">37h</div><div class="stat-note">Exact, based on unfinished lectures</div></div>
- </div>
- <div class="card"><h3 style="margin-top:0">Static GK checklist</h3><div class="small" style="margin-bottom:12px">Topic names are editable; rename each lecture to match your batch order.</div><div id="gkList" class="topic-list"></div></div>
-</section>
-
-
-<section id="grammar" class="page">
- <div class="section-head"><div><h2>Grammar Granth</h2><div class="muted">72 lectures • exact duration per lecture not provided yet.</div></div></div>
-
- <div class="grid stats">
-  <div class="card"><div class="stat-label">Lectures completed</div><div class="stat-value cyan" id="grammarCount">0/72</div><div class="progress"><div id="grammarBar"></div></div><div class="stat-note" id="grammarHours">0 lectures completed</div></div>
-  <div class="card"><div class="stat-label">Lectures remaining</div><div class="stat-value yellow" id="grammarRemaining">72</div><div class="stat-note">Mark complete after watching</div></div>
- </div>
- <div class="card"><h3 style="margin-top:0">Grammar Granth checklist</h3><div class="small" style="margin-bottom:12px">Rename lectures with their actual grammar topic and add doubts or notes.</div><div id="grammarList" class="topic-list"></div></div>
-</section>
-
-<section id="editorial" class="page">
- <div class="section-head"><div><h2>Daily Editorial Reading</h2><div class="muted">Build a daily English reading habit and save vocabulary/revision notes.</div></div></div>
- <div class="card" style="margin-bottom:14px"><h3 style="margin-top:0">Log today's editorial</h3><form id="editorialForm"><div class="form-grid">
-  <div class="field"><label>Date</label><input type="date" id="editorialDate" required></div>
-  <div class="field"><label>Publication / source</label><input id="editorialSource" placeholder="Newspaper / website"></div>
-  <div class="field"><label>Time spent (minutes)</label><input type="number" id="editorialTime" min="0" value="20"></div>
-  <div class="field wide"><label>Headline / topic</label><input id="editorialHeadline" required placeholder="Editorial headline"></div>
-  <div class="field wide"><label>Summary in your own words</label><textarea id="editorialSummary" rows="3" placeholder="Write 3–5 lines in your own words"></textarea></div>
-  <div class="field wide"><label>New vocabulary / phrases</label><textarea id="editorialVocab" rows="3" placeholder="Word — meaning — your sentence"></textarea></div>
-  <div class="field wide"><label>Takeaway / grammar observations</label><textarea id="editorialNotes" rows="2"></textarea></div>
- </div><div class="form-actions"><button class="btn" type="submit">Save editorial log</button></div></form></div>
- <div class="card"><h3 style="margin-top:0">Editorial history</h3><div id="editorialHistory"></div></div>
-</section>
-
-<section id="todo" class="page">
- <div class="section-head"><div><h2>To-do List</h2><div class="muted">Daily tasks for lectures, practice, revision and editorial reading.</div></div></div>
- <div class="card" style="margin-bottom:14px"><form id="todoForm"><div class="form-grid">
-  <div class="field wide"><label>Task</label><input id="todoText" required placeholder="e.g. Complete 2 reasoning lectures"></div>
-  <div class="field"><label>Due date</label><input type="date" id="todoDate" required></div>
-  <div class="field"><label>Priority</label><select id="todoPriority"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
-  <div class="field"><label>Category</label><select id="todoCategory"><option>Quant</option><option>Reasoning</option><option>English</option><option>Static GK</option><option>Editorial</option><option>Revision</option><option>Mock Test</option><option>Other</option></select></div>
- </div><div class="form-actions"><button class="btn" type="submit">+ Add task</button><button class="btn secondary" type="button" onclick="addDailyTemplate()">Add daily routine</button></div></form></div>
- <div class="toolbar"><select id="todoFilter" onchange="renderTodos()"><option value="Open">Open tasks</option><option value="All">All tasks</option><option value="Done">Completed tasks</option></select></div><div class="card"><div id="todoList"></div></div>
-</section>
-
-<section id="exams" class="page">
- <div class="section-head"><div><h2>Exam Calendar & Reminders</h2><div class="muted">Keep current and next-year exams visible. Dates you haven't confirmed stay marked as tentative.</div></div></div>
- <div class="card" style="margin-bottom:14px"><h3 style="margin-top:0">Add an exam / important date</h3><form id="examForm"><div class="form-grid">
-  <div class="field"><label>Exam name</label><input id="examName" required placeholder="e.g. IBPS PO 2027"></div>
-  <div class="field"><label>Exam date</label><input id="examDate" type="date" required></div>
-  <div class="field"><label>Status</label><select id="examStatus"><option>Confirmed</option><option selected>Tentative</option><option>Expected</option></select></div>
-  <div class="field"><label>Exam stage</label><select id="examStage"><option>Prelims</option><option>Mains</option><option>Interview</option><option>Notification</option><option>Application deadline</option><option>Other</option></select></div>
-  <div class="field wide"><label>Notes / official notification link name</label><input id="examNotes" placeholder="e.g. Check official notification"></div>
- </div><div class="form-actions"><button class="btn" type="submit">Save exam date</button></div></form></div>
- <div class="card"><h3 style="margin-top:0">Upcoming exams & dates</h3><div class="small" style="margin-bottom:12px">Preloaded RRB Clerk date is the target you previously gave me; verify official dates before relying on it. Add 2027 exams as tentative until announced.</div><div id="examList"></div></div>
-</section>
-
-<section id="tests" class="page">
- <div class="section-head"><div><h2>Tests & performance</h2><div class="muted">Log every sectional test or mock and use the analysis to improve.</div></div></div>
- <div class="card" style="margin-bottom:16px"><h3 style="margin-top:0">Log a test</h3><form id="testForm"><div class="form-grid">
-  <div class="field"><label>Test date</label><input type="date" id="testDate" required></div>
-  <div class="field"><label>Test name</label><input id="testName" required placeholder="e.g. Inequality sectional 03"></div>
-  <div class="field"><label>Test type</label><select id="testType"><option>Topic test</option><option>Sectional</option><option>Full mock</option><option>PYQ practice</option></select></div>
-  <div class="field"><label>Subject</label><select id="testSubject"><option>Quant</option><option>Reasoning</option><option>English</option><option>General Awareness</option><option>Full Prelims</option><option>Other</option></select></div>
-  <div class="field"><label>Score / marks obtained</label><input type="number" id="testScore" min="0" step="0.01" required placeholder="e.g. 27"></div>
-  <div class="field"><label>Maximum marks</label><input type="number" id="testMax" min="1" step="0.01" required placeholder="e.g. 40"></div>
-  <div class="field"><label>Attempted questions</label><input type="number" id="testAttempted" min="0" value="0"></div>
-  <div class="field"><label>Correct answers</label><input type="number" id="testCorrect" min="0" value="0"></div>
-  <div class="field"><label>Time taken (minutes)</label><input type="number" id="testTime" min="0" step="0.5" placeholder="e.g. 22"></div>
-  <div class="field wide"><label>Analysis / mistakes / next action</label><textarea id="testNotes" rows="2" placeholder="What went wrong? Which topic needs work?"></textarea></div>
- </div><div class="form-actions"><button class="btn" type="submit">Save test result</button></div></form></div>
- <div class="card"><div class="section-head"><div><h3 style="margin:0">Test history</h3><div class="small">Newest first • delete a record if entered incorrectly</div></div><button class="btn secondary tiny" onclick="exportCSV('tests')">Export tests CSV</button></div><div id="testHistory" class="table-wrap"></div></div>
-</section>
-
-<section id="revision" class="page">
- <div class="section-head"><div><h2>Revision planner</h2><div class="muted">Use the fixed 1–3–7–15 day spaced-repetition cycle: first review after 1 day, then 3, 7 and 15 days.</div></div></div>
-
- <div class="grid stats">
-  <div class="card"><div class="stat-label">Overdue</div><div class="stat-value pink" id="revOverdue">0</div></div>
-  <div class="card"><div class="stat-label">Due today</div><div class="stat-value yellow" id="revToday">0</div></div>
-  <div class="card"><div class="stat-label">Upcoming</div><div class="stat-value cyan" id="revUpcoming">0</div></div>
-  <div class="card"><div class="stat-label">Revision sessions logged</div><div class="stat-value purple" id="revSessions">0</div></div>
- </div>
- <div class="card"><h3 style="margin-top:0">Topics to revise</h3><div class="small" style="margin-bottom:12px">Follow the 1–3–7–15 day cycle. Set the first review for 1 day after learning; each completed review automatically schedules the next one at 3, 7, then 15 days. After day 15, repeat every 15 days.</div><div id="revisionList"></div></div>
- <div class="card" style="margin-top:14px"><h3 style="margin-top:0">Revision history</h3><div id="revisionHistory"></div></div>
-</section>
-
-<section id="backup" class="page">
- <div class="section-head"><div><h2>Backup & settings</h2><div class="muted">Your data is saved in this browser on this device.</div></div></div>
- <div class="grid two">
-  <div class="card"><h3 style="margin-top:0">Export your data</h3><p class="muted">Download a backup before changing devices or clearing browser data.</p><div class="actions"><button class="btn" onclick="exportJSON()">Download full backup (JSON)</button><button class="btn secondary" onclick="exportCSV('topics')">Syllabus CSV</button><button class="btn secondary" onclick="exportCSV('tests')">Tests CSV</button></div><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><label for="importFile">Restore from backup JSON</label><input type="file" id="importFile" accept=".json,application/json"><button class="btn secondary" style="margin-top:10px" onclick="importJSON()">Import backup</button></div>
-  <div class="card"><h3 style="margin-top:0">Preparation settings</h3><label>Target exam</label><input value="IBPS RRB Clerk Prelims" disabled><label style="margin-top:12px">Exam date</label><input value="6 December 2026" disabled><label style="margin-top:12px">Suggested revision intervals</label><div class="muted">Revision cycle: Day 1 → Day 3 → Day 7 → Day 15. After the Day 15 review, repeat every 15 days. Set a topic’s first revision date to the day after learning it.</div><div class="actions" style="margin-top:14px"><button class="btn danger" onclick="clearAll()">Reset all tracker data</button></div><p class="small">Reset permanently clears the data stored by this tracker in this browser. Export a backup first.</p></div>
- </div>
-</section>
-</main>
-<footer>Made for your banking preparation • Data stays in this browser • Export backups regularly</footer>
-<div class="toast" id="toast"></div>
-<script>
-const KEY='bankPrepTracker_v1';
-const defaults=[
-['Quant','Simplification'],['Quant','Approximation'],['Quant','Number Series'],['Quant','Quadratic Equations'],['Quant','Percentage'],['Quant','Ratio and Proportion'],['Quant','Average'],['Quant','Profit and Loss'],['Quant','Simple and Compound Interest'],['Quant','Time and Work'],['Quant','Pipes and Cisterns'],['Quant','Time, Speed and Distance'],['Quant','Boats and Streams'],['Quant','Mixture and Alligation'],['Quant','Partnership'],['Quant','Mensuration'],['Quant','Data Interpretation'],['Quant','Missing DI / Caselet DI'],
-['Reasoning','Inequality'],['Reasoning','Coded Inequality'],['Reasoning','Syllogism'],['Reasoning','Coding-Decoding'],['Reasoning','Blood Relations'],['Reasoning','Direction and Distance'],['Reasoning','Order and Ranking'],['Reasoning','Alphanumeric Series'],['Reasoning','Pair Formation'],['Reasoning','Word Formation'],['Reasoning','Linear Seating Arrangement'],['Reasoning','Circular Seating Arrangement'],['Reasoning','Floor / Flat Puzzle'],['Reasoning','Box / Month / Day Puzzle'],['Reasoning','Scheduling Puzzle'],
-['English','Reading Comprehension'],['English','Cloze Test'],['English','Error Detection'],['English','Fillers'],['English','Phrase Replacement'],['English','Para Jumbles'],['English','Word Usage and Vocabulary'],
-['General Awareness','Daily Current Affairs'],['General Awareness','Banking Awareness'],['General Awareness','Static GK']
-];
-
-const quantLectureTopics = [
-'Vedic Maths','Simplification & Approximation','Number Series','Linear / Quadratic Equation',
-'Percentage','Ratio & Proportion','Problem on Ages','Mixture & Allegations',
-'Profit, Loss & Discount','Partnership','Average','AP & GP',
-'Simple & Compound Interest','Time, Work & Wages','Number System','Pipe & Cistern',
-'Time, Speed & Distance','Mensuration 2D & 3D','Boat & Stream','Permutations & Combination'
-];
-
-const reasoningTopicNames = [
-'Coding-Decoding','Inequality & Coded Inequality','Alphanumeric & Number Series',
-'Blood Relation','Direction & Distance','Syllogism','Order & Ranking',
-'Puzzle & Seating Arrangement','Alphabet / Letter Basics','Analogy','Pair Formation','Word Formation','Linear / Circular Seating Arrangement','Floor / Flat Puzzle','Box / Month / Day Puzzle','Scheduling Puzzle','Input-Output','Data Sufficiency','Logical Reasoning','Doubt Classes','Orientation Class','Other / Unassigned'
-];
-let state={topics:[],tests:[],revisions:[],lectures:[],reasoningLectures:[],englishLectures:[],gkLectures:[],grammarLectures:[],editorials:[],todos:[],exams:[],dailyDate:'',daily:{}};
-const $=id=>document.getElementById(id);
-const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
-function recordStudyDay(){if(!Array.isArray(state.studyDays))state.studyDays=[];const d=today();if(!state.studyDays.includes(d))state.studyDays.push(d);save();renderStreak()}
-function getStreak(){const days=new Set(state.studyDays||[]);let d=new Date();if(!days.has(today()))d.setDate(d.getDate()-1);let n=0;while(days.has(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`)){n++;d.setDate(d.getDate()-1)}return n}
-function renderStreak(){if(!$('streakCount'))return;const days=new Set(state.studyDays||[]),n=getStreak();$('streakCount').textContent=n+' day'+(n===1?'':'s');$('streakMessage').textContent=days.has(today())?'Great work — today counts toward your streak!':'Do one study action today to keep/build your streak.';let bits=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);let k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;bits.push(`<span style="display:inline-block;padding:4px 7px;border-radius:8px;margin:2px;background:${days.has(k)?'rgba(74,222,128,.2)':'var(--panel2)'};color:${days.has(k)?'var(--green)':'var(--muted)'}">${d.toLocaleDateString('en-IN',{weekday:'short'})} ${days.has(k)?'✓':'·'}</span>`)}$('streakCalendar').innerHTML=bits.join('')}
-function fmtCountdown(ms){if(ms<=0)return 'Exam date reached / passed';let t=Math.floor(ms/1000),d=Math.floor(t/86400);t%=86400;let h=Math.floor(t/3600);t%=3600;let m=Math.floor(t/60),sec=t%60;return `${d}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(sec).padStart(2,'0')}s`}
-function updateCountdowns(){const now=new Date();const upcoming=(state.exams||[]).filter(x=>x.date&&new Date(x.date+'T23:59:59')>=now).sort((a,b)=>a.date.localeCompare(b.date));const hero=$('heroCountdown');if(hero){if(upcoming.length){const x=upcoming[0];hero.textContent=fmtCountdown(new Date(x.date+'T23:59:59').getTime()-now.getTime());$('heroExamName').textContent=`${x.name} • ${x.date} • ${x.status}`}else{hero.textContent='No upcoming exam';$('heroExamName').textContent='Add an exam date in Exam Calendar'}}document.querySelectorAll('[data-exam-countdown]').forEach(el=>{const end=new Date(el.dataset.examCountdown+'T23:59:59').getTime();el.textContent=fmtCountdown(end-now.getTime())})}
-let timerInterval=null;
-function timerElapsed(){const t=state.studyTimer||{elapsed:0,runningSince:null};return Math.max(0,(+t.elapsed||0)+(t.runningSince?Math.floor((Date.now()-t.runningSince)/1000):0))}
-function fmtClock(sec){sec=Math.max(0,Math.floor(sec));const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return [h,m,s].map(x=>String(x).padStart(2,'0')).join(':')}
-function formatDuration(sec){sec=Math.max(0,Math.floor(sec));const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);return h?`${h}h ${m}m`:`${m}m`}
-function renderStudyTimer(){if(!$('timerDisplay'))return;const elapsed=timerElapsed();$('timerDisplay').textContent=fmtClock(elapsed);const todaySecs=(state.studySessions||[]).filter(x=>x.date===today()).reduce((n,x)=>n+(+x.seconds||0),0)+(state.studyTimer?.runningSince?Math.max(0,Math.floor((Date.now()-state.studyTimer.runningSince)/1000)):0);$('todayStudyTime').textContent=formatDuration(todaySecs);const running=!!state.studyTimer?.runningSince;$('timerStatus').textContent=running?`Timer running • ${state.studyTimer.subject||'Study'} • started ${new Date(state.studyTimer.runningSince).toLocaleTimeString()}`:'Timer paused. Start when you begin focused study.';$('timerStartBtn').disabled=running;$('timerPauseBtn').disabled=!running;const sessions=[...(state.studySessions||[])].filter(x=>x.date===today()).slice(-4).reverse();$('studySessionLog').textContent=sessions.length?'Recent sessions: '+sessions.map(x=>`${x.subject} ${formatDuration(x.seconds)}`).join(' • '):'No completed focus sessions logged today.'}
-function startStudyTimer(){if(!state.studyTimer)state.studyTimer={elapsed:0,runningSince:null,subject:'Quant'};if(state.studyTimer.runningSince)return;state.studyTimer.subject=$('timerSubject')?.value||'Quant';state.studyTimer.runningSince=Date.now();save();renderStudyTimer();toast('Focus timer started')}
-function pauseStudyTimer(){if(!state.studyTimer?.runningSince)return;const seconds=Math.max(0,Math.floor((Date.now()-state.studyTimer.runningSince)/1000));state.studyTimer.elapsed=(+state.studyTimer.elapsed||0)+seconds;state.studyTimer.runningSince=null;if(seconds>0){if(!Array.isArray(state.studySessions))state.studySessions=[];state.studySessions.push({id:'ss'+Date.now(),date:today(),subject:state.studyTimer.subject||'Study',seconds})}if(seconds>=60)recordStudyDay();save();renderStudyTimer();toast(seconds>0?'Study session saved':'Timer paused')}
-function resetStudyTimer(){if(!confirm('Reset the current timer? Completed study sessions will be kept.'))return;if(state.studyTimer?.runningSince){const seconds=Math.max(0,Math.floor((Date.now()-state.studyTimer.runningSince)/1000));if(seconds>=60){if(!Array.isArray(state.studySessions))state.studySessions=[];state.studySessions.push({id:'ss'+Date.now(),date:today(),subject:state.studyTimer.subject||'Study',seconds})}}state.studyTimer={elapsed:0,runningSince:null,subject:$('timerSubject')?.value||'Quant'};save();renderStudyTimer();toast('Current timer reset')}
-function load(){try{let s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.topics))state={...state,...s}}catch(e){}state.topics.forEach(t=>{if(!Number.isFinite(+t.revisionInterval))t.revisionInterval=0;if(!Number.isFinite(+t.revisionCount))t.revisionCount=0;if(!t.lastReviewed)t.lastReviewed=''});if(!Array.isArray(state.lectures)||state.lectures.length!==20){let old=state.lectures||[];state.lectures=quantLectureTopics.map((name,i)=>{let found=old.find(x=>x.number===i+1&&x.group==='Quant');return found||{id:'ql'+(i+1),group:'Quant',number:i+1,name,done:false,duration:1.75,notes:''}});save()}if(!Array.isArray(state.reasoningLectures)||state.reasoningLectures.length!==75){let oldR=state.reasoningLectures||[];state.reasoningLectures=Array.from({length:75},(_,i)=>{let found=oldR.find(x=>x.number===i+1);return found||{id:'rL'+(i+1),number:i+1,topic:'Other / Unassigned',name:`Reasoning Lecture ${i+1}`,done:false,duration:1.75,notes:''}});save()}if(!Array.isArray(state.englishLectures)||state.englishLectures.length!==73){let oldE=state.englishLectures||[];state.englishLectures=Array.from({length:73},(_,i)=>oldE.find(x=>x.number===i+1)||{id:'eL'+(i+1),number:i+1,name:`English Video ${i+1}`,done:false,duration:1,notes:''});save()}if(!Array.isArray(state.gkLectures)||state.gkLectures.length!==37){let oldG=state.gkLectures||[];state.gkLectures=Array.from({length:37},(_,i)=>oldG.find(x=>x.number===i+1)||{id:'gkL'+(i+1),number:i+1,name:`Static GK Lecture ${i+1}`,done:false,duration:1,notes:''});save()}if(!Array.isArray(state.grammarLectures)||state.grammarLectures.length!==72){let oldGr=state.grammarLectures||[];state.grammarLectures=Array.from({length:72},(_,i)=>oldGr.find(x=>x.number===i+1)||{id:'grL'+(i+1),number:i+1,name:`Grammar Granth Lecture ${i+1}`,done:false,notes:''});save()}if(!Array.isArray(state.editorials))state.editorials=[];if(!Array.isArray(state.todos))state.todos=[];if(!Array.isArray(state.exams))state.exams=[];if(!Array.isArray(state.studyDays))state.studyDays=[];if(!state.exams.some(x=>x.name==='IBPS RRB Clerk Prelims'))state.exams.push({id:'exam-rrb-clerk',name:'IBPS RRB Clerk Prelims',date:'2026-12-06',status:'Target date — verify official notice',stage:'Prelims',notes:'Target date provided by you; verify official notification'});if(!state.topics.length){state.topics=defaults.map((x,i)=>({id:'t'+(i+1),subject:x[0],name:x[1],priority:['Simplification','Inequality','Syllogism','Number Series','Coding-Decoding'].includes(x[1])?'High':'Medium',learn:0,practice:0,pyq:0,nextRevision:'',questions:0,accuracy:'',notes:'',created:today()}));save()}if(state.dailyDate!==today()){state.dailyDate=today();state.daily={};save()}$('testDate').value=today();if($('editorialDate'))$('editorialDate').value=today();if($('todoDate'))$('todoDate').value=today();renderAll();renderStreak();updateCountdowns();renderStudyTimer();setInterval(updateCountdowns,1000);setInterval(renderStudyTimer,1000);$('timerSubject')?.addEventListener('change',()=>{if(state.studyTimer&&!state.studyTimer.runningSince){state.studyTimer.subject=$('timerSubject').value;save();renderStudyTimer()}});document.querySelectorAll('[data-daily]').forEach(c=>{c.checked=!!state.daily[c.dataset.daily];c.addEventListener('change',()=>{state.daily[c.dataset.daily]=c.checked;if(c.checked)recordStudyDay();else save()})})}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){console.warn('Local save unavailable',e);if($('toast'))toast('Browser storage unavailable — export a backup to keep your data')}}
-function toast(s){let t=$('toast');t.textContent=s;t.style.display='block';setTimeout(()=>t.style.display='none',2200)}
-function go(page){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.page===page));if(page==='syllabus')renderTopics();if(page==='tests')renderTests();if(page==='revision')renderRevision();if(page==='lectures')renderLectures();if(page==='reasoning')renderReasoningLectures();if(page==='english')renderEnglishLectures();if(page==='staticgk')renderGkLectures();if(page==='grammar')renderGrammarLectures();if(page==='editorial')renderEditorials();if(page==='todo')renderTodos();if(page==='exams')renderExams();window.scrollTo({top:0,behavior:'smooth'})}
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>go(t.dataset.page)));
-function topicStatus(t){if(t.learn===2&&t.practice===2&&t.pyq===2)return'Completed';if(t.learn===2&&t.practice===2)return'Ready for revision';if(t.learn||t.practice||t.pyq)return'In progress';return'Not started'}
-function percent(t){return Math.round(((+t.learn||0)+(+t.practice||0)+(+t.pyq||0))/6*100)}
-function renderAll(){renderDashboard();renderStreak();updateCountdowns();renderStudyTimer();renderTopics();renderTests();renderRevision();renderLectures();renderReasoningLectures();renderEnglishLectures();renderGkLectures();renderGrammarLectures();renderEditorials();renderTodos();renderExams()}
-function renderDashboard(){
- let n=state.topics.length,done=state.topics.filter(t=>topicStatus(t)==='Completed').length,p=n?Math.round(done/n*100):0;
- $('statSyllabus').textContent=p+'%';$('statTopics').textContent=`${done} of ${n} topics completed`;$('barSyllabus').style.width=p+'%';$('statTests').textContent=state.tests.length;
- let accuracy=state.tests.filter(t=>t.attempted>0).map(t=>t.correct/t.attempted*100);$('statAccuracy').textContent=accuracy.length?(accuracy.reduce((a,b)=>a+b,0)/accuracy.length).toFixed(1)+'%':'—';
- let due=dueTopics();$('statDue').textContent=due.length;
- let subjects=[...new Set(state.topics.map(t=>t.subject))];$('subjectProgress').innerHTML=subjects.map(s=>{let a=state.topics.filter(t=>t.subject===s),d=a.filter(t=>topicStatus(t)==='Completed').length,pc=a.length?Math.round(d/a.length*100):0;return `<div class="subject-row"><div class="subject-line"><span>${esc(s)}</span><span>${d}/${a.length} • ${pc}%</span></div><div class="progress"><div style="width:${pc}%"></div></div></div>`}).join('')||'<div class="empty">Add topics to start tracking.</div>';
- $('dashboardDue').innerHTML=due.slice(0,6).map(t=>`<div class="due-item"><div><strong>${esc(t.name)}</strong><div class="small">${esc(t.subject)} • ${t.nextRevision===today()?'Due today':t.nextRevision<today()?'Overdue':'Upcoming '+t.nextRevision}</div></div><button class="btn secondary tiny" onclick="revise('${t.id}')">Revise</button></div>`).join('')||'<div class="empty">No revisions due. Schedule dates for topics you have studied.</div>';
- let tests=[...state.tests].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);$('latestTests').innerHTML=tests.length?tests.map(t=>`<div class="due-item"><div><strong>${esc(t.name)}</strong><div class="small">${esc(t.date)} • ${esc(t.type)} • ${esc(t.subject)}</div></div><div style="text-align:right"><strong>${t.score}/${t.max}</strong><div class="small">${t.max?Math.round(t.score/t.max*100):0}%</div></div></div>`).join(''):'<div class="empty">Your test results will appear here.</div>';
+function cloudStatus(message) {
+  const el = document.getElementById("cloudStatus");
+  if (el) el.textContent = message;
 }
 
-function renderLectures(){
- const all=state.lectures||[],done=all.filter(x=>x.done).length,left=all.length-done;
- $('lectureCount').textContent=`${done}/20`;
- $('lectureBar').style.width=(done/20*100)+'%';
- $('lectureHours').textContent=`${all.filter(x=>x.done).reduce((s,x)=>s+(+x.duration||1.75),0).toFixed(1)} hours completed`;
- $('lectureRemaining').textContent=left;
- $('lectureTimeLeft').textContent=`${Math.round(left*1.5)}–${Math.round(left*2)}h`;
- $('lectureList').innerHTML=all.map(x=>`<article class="topic"><div><h3>Topic ${x.number}: ${esc(x.name)}</h3><div class="topic-meta"><span class="tag">Quant</span><span class="tag ${x.done?'done':''}">${x.done?'Lecture completed':'Pending'}</span><span class="tag">90–120 min approx.</span></div>${x.notes?`<div class="small" style="margin-top:5px">Notes: ${esc(x.notes)}</div>`:''}</div><div class="topic-actions"><label class="checkline"><input type="checkbox" ${x.done?'checked':''} onchange="toggleLecture('${x.id}',this.checked)"> Watched</label><button class="btn secondary tiny" onclick="editLecture('${x.id}')">Duration / notes</button></div></article>`).join('');
+function configureCloud(projectUrl, publishableKey) {
+  const url = projectUrl.trim().replace(/\/$/, "");
+  const key = publishableKey.trim();
+
+  if (!url.startsWith("https://") || !key) {
+    cloudStatus("Enter a valid Supabase URL and publishable key.");
+    return;
+  }
+
+  localStorage.setItem(
+    CLOUD_CONFIG_KEY,
+    JSON.stringify({ url, key })
+  );
+
+  cloudClient = window.supabase.createClient(url, key);
+  cloudStatus("Connection saved. Create an account or log in.");
 }
-function toggleLecture(id,done){let x=state.lectures.find(x=>x.id===id);if(!x)return;x.done=done;if(done)recordStudyDay();save();renderLectures();toast(done?'Lecture marked complete':'Lecture marked pending')}
-function editLecture(id){let x=state.lectures.find(x=>x.id===id);if(!x)return;let d=prompt('Actual lecture duration in hours (e.g. 1.5 or 2):',x.duration||1.75);if(d===null)return;let n=Number(d);if(!Number.isFinite(n)||n<=0||n>10){toast('Enter a valid duration');return}let notes=prompt('Notes / doubts for this topic:',x.notes||'');if(notes===null)return;x.duration=n;x.notes=notes;save();renderLectures();toast('Lecture details saved')}
 
+async function cloudSignUp(email, password) {
+  if (!cloudClient) {
+    cloudStatus("Save your Supabase connection settings first.");
+    return;
+  }
 
-function renderReasoningLectures(){
- if(!$('reasoningList'))return;
- const all=state.reasoningLectures||[],done=all.filter(x=>x.done).length,left=all.length-done;
- $('reasoningCount').textContent=`${done}/75`;
- $('reasoningBar').style.width=(done/75*100)+'%';
- $('reasoningHours').textContent=`${all.filter(x=>x.done).reduce((s,x)=>s+(+x.duration||1.75),0).toFixed(1)} hours completed`;
- $('reasoningRemaining').textContent=left;
- $('reasoningTimeLeft').textContent=`${(left*1.5).toFixed(1)}–${left*2}h`;
- const filter=$('reasoningTopicFilter')?.value||'All', search=($('reasoningSearch')?.value||'').toLowerCase();
- if($('reasoningTopicFilter')){const sel=$('reasoningTopicFilter');const current=sel.value;sel.innerHTML='<option value="All">All topics</option>'+reasoningTopicNames.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');sel.value=reasoningTopicNames.includes(current)||current==='All'?current:'All'}
- if($('reasoningTopicSummary'))$('reasoningTopicSummary').innerHTML=reasoningTopicNames.filter(t=>t!=='Other / Unassigned').map(t=>{const items=all.filter(x=>x.topic===t),complete=items.filter(x=>x.done).length;return `<span class="tag">${esc(t)}: ${complete}/${items.length}</span>`}).join('')+`<span class="tag">Unassigned: ${all.filter(x=>!x.topic||x.topic==='Other / Unassigned').length}</span>`;
- const filtered=all.filter(x=>(filter==='All'||x.topic===filter)&&`${x.name} ${x.topic} ${x.notes}`.toLowerCase().includes(search));
- $('reasoningList').innerHTML=filtered.map(x=>`<article class="topic"><div style="flex:1;min-width:220px"><h3>Lecture ${x.number}: ${esc(x.name||'Reasoning Lecture '+x.number)}</h3><div class="topic-meta"><span class="tag">Reasoning</span><span class="tag ${x.done?'done':''}">${x.done?'Completed':'Pending'}</span><span class="tag">90–120 min approx.</span></div><div class="field" style="margin-top:8px;max-width:320px"><label>Assign topic</label><select onchange="assignReasoningTopic('${x.id}',this.value)">${reasoningTopicNames.map(t=>`<option value="${esc(t)}" ${x.topic===t?'selected':''}>${esc(t)}</option>`).join('')}</select></div>${x.notes?`<div class="small" style="margin-top:5px">Notes: ${esc(x.notes)}</div>`:''}</div><div class="topic-actions"><label class="checkline"><input type="checkbox" ${x.done?'checked':''} onchange="toggleReasoningLecture('${x.id}',this.checked)"> Watched</label><button class="btn secondary tiny" onclick="editReasoningLecture('${x.id}')">Rename / notes</button></div></article>`).join('')||'<div class="empty">No matching lectures. Try another topic or search.</div>';
+  const { data, error } = await cloudClient.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    cloudStatus("Signup failed: " + error.message);
+    return;
+  }
+
+  if (!data.session) {
+    cloudStatus("Check your email to confirm your account, then log in.");
+    return;
+  }
+
+  cloudUser = data.user;
+  await cloudInitialSync();
 }
-function assignReasoningTopic(id,topic){const x=state.reasoningLectures.find(x=>x.id===id);if(!x)return;x.topic=topic;save();renderReasoningLectures();toast('Reasoning topic assigned')}
 
-function toggleReasoningLecture(id,done){let x=state.reasoningLectures.find(x=>x.id===id);if(!x)return;x.done=done;if(done)recordStudyDay();save();renderReasoningLectures();toast(done?'Reasoning lecture completed':'Lecture marked pending')}
-function editReasoningLecture(id){let x=state.reasoningLectures.find(x=>x.id===id);if(!x)return;let topic=prompt('Topic name:',x.topic);if(topic===null)return;let d=prompt('Actual lecture duration in hours (e.g. 1.5 or 2):',x.duration||1.75);if(d===null)return;let n=Number(d);if(!Number.isFinite(n)||n<=0||n>10){toast('Enter a valid duration');return}let notes=prompt('Notes / doubts:',x.notes||'');if(notes===null)return;x.topic=topic.trim()||x.topic;x.duration=n;x.notes=notes;save();renderReasoningLectures();toast('Reasoning lecture details saved')}
+async function cloudLogin(email, password) {
+  if (!cloudClient) {
+    cloudStatus("Save your Supabase connection settings first.");
+    return;
+  }
 
+  const { data, error } = await cloudClient.auth.signInWithPassword({
+    email,
+    password
+  });
 
-function renderEnglishLectures(){
- if(!$('englishList'))return;
- const all=state.englishLectures||[],done=all.filter(x=>x.done).length,left=all.length-done;
- $('englishCount').textContent=`${done}/73`;
- $('englishBar').style.width=(done/73*100)+'%';
- $('englishHours').textContent=`${done} of 73 hours completed`;
- $('englishRemaining').textContent=left;
- $('englishTimeLeft').textContent=`${left}h`;
- $('englishList').innerHTML=all.map(x=>`<article class="topic"><div><h3>Video ${x.number}: ${esc(x.name)}</h3><div class="topic-meta"><span class="tag">English • Perfection Batch</span><span class="tag ${x.done?'done':''}">${x.done?'Completed':'Pending'}</span><span class="tag">60 minutes exact</span></div>${x.notes?`<div class="small" style="margin-top:5px">Notes: ${esc(x.notes)}</div>`:''}</div><div class="topic-actions"><label class="checkline"><input type="checkbox" ${x.done?'checked':''} onchange="toggleEnglishLecture('${x.id}',this.checked)"> Watched</label><button class="btn secondary tiny" onclick="editEnglishLecture('${x.id}')">Rename / notes</button></div></article>`).join('');
+  if (error) {
+    cloudStatus("Login failed: " + error.message);
+    return;
+  }
+
+  cloudUser = data.user;
+  await cloudInitialSync();
 }
-function toggleEnglishLecture(id,done){let x=state.englishLectures.find(x=>x.id===id);if(!x)return;x.done=done;if(done)recordStudyDay();save();renderEnglishLectures();toast(done?'English video completed':'Video marked pending')}
-function editEnglishLecture(id){let x=state.englishLectures.find(x=>x.id===id);if(!x)return;let name=prompt('Video / topic name:',x.name);if(name===null)return;let notes=prompt('Notes / doubts:',x.notes||'');if(notes===null)return;x.name=name.trim()||x.name;x.notes=notes;save();renderEnglishLectures();toast('English video details saved')}
 
+async function cloudInitialSync() {
+  cloudReady = false;
 
-function renderGkLectures(){
- if(!$('gkList'))return;
- const all=state.gkLectures||[],done=all.filter(x=>x.done).length,left=all.length-done;
- $('gkCount').textContent=`${done}/37`;
- $('gkBar').style.width=(done/37*100)+'%';
- $('gkHours').textContent=`${done} of 37 hours completed`;
- $('gkRemaining').textContent=left;
- $('gkTimeLeft').textContent=`${left}h`;
- $('gkList').innerHTML=all.map(x=>`<article class="topic"><div><h3>Lecture ${x.number}: ${esc(x.name)}</h3><div class="topic-meta"><span class="tag">Static GK</span><span class="tag ${x.done?'done':''}">${x.done?'Completed':'Pending'}</span><span class="tag">60 minutes exact</span></div>${x.notes?`<div class="small" style="margin-top:5px">Notes: ${esc(x.notes)}</div>`:''}</div><div class="topic-actions"><label class="checkline"><input type="checkbox" ${x.done?'checked':''} onchange="toggleGkLecture('${x.id}',this.checked)"> Watched</label><button class="btn secondary tiny" onclick="editGkLecture('${x.id}')">Rename / notes</button></div></article>`).join('');
+  try {
+    const { data, error } = await cloudClient
+      .from("planner_data")
+      .select("data")
+      .eq("user_id", cloudUser.id)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (data) {
+      const choice = prompt(
+        "Cloud data exists. Type LOAD to use cloud data, " +
+        "or UPLOAD to replace it with this browser's data."
+      );
+
+      if (choice === "LOAD") {
+        state = { ...state, ...data.data };
+        localStorage.setItem(KEY, JSON.stringify(state));
+        renderAll();
+      } else if (choice === "UPLOAD") {
+        await cloudSaveNow();
+      } else {
+        cloudStatus("Sync cancelled. Local data remains unchanged.");
+        return;
+      }
+    } else {
+      await cloudSaveNow();
+    }
+
+    cloudReady = true;
+    cloudStatus("Cloud sync connected.");
+  } catch (error) {
+    cloudStatus("Cloud sync error: " + error.message);
+  }
 }
-function toggleGkLecture(id,done){let x=state.gkLectures.find(x=>x.id===id);if(!x)return;x.done=done;if(done)recordStudyDay();save();renderGkLectures();toast(done?'Static GK lecture completed':'Lecture marked pending')}
-function editGkLecture(id){let x=state.gkLectures.find(x=>x.id===id);if(!x)return;let name=prompt('Lecture / topic name:',x.name);if(name===null)return;let notes=prompt('Notes / facts to revise:',x.notes||'');if(notes===null)return;x.name=name.trim()||x.name;x.notes=notes;save();renderGkLectures();toast('Static GK lecture details saved')}
 
+async function cloudSaveNow() {
+  if (!cloudClient || !cloudUser) return;
 
-function renderGrammarLectures(){if(!$('grammarList'))return;let all=state.grammarLectures||[],done=all.filter(x=>x.done).length;$('grammarCount').textContent=`${done}/72`;$('grammarBar').style.width=(done/72*100)+'%';$('grammarHours').textContent=`${done} of 72 lectures completed`;$('grammarRemaining').textContent=72-done;$('grammarList').innerHTML=all.map(x=>`<article class="topic"><div><h3>Lecture ${x.number}: ${esc(x.name)}</h3><div class="topic-meta"><span class="tag">Grammar Granth</span><span class="tag ${x.done?'done':''}">${x.done?'Completed':'Pending'}</span></div>${x.notes?`<div class="small">Notes: ${esc(x.notes)}</div>`:''}</div><div class="topic-actions"><label class="checkline"><input type="checkbox" ${x.done?'checked':''} onchange="toggleGrammar('${x.id}',this.checked)"> Watched</label><button class="btn secondary tiny" onclick="editGrammar('${x.id}')">Rename / notes</button></div></article>`).join('')}
-function toggleGrammar(id,done){let x=state.grammarLectures.find(x=>x.id===id);if(!x)return;x.done=done;if(done)recordStudyDay();save();renderGrammarLectures();toast(done?'Grammar lecture completed':'Lecture marked pending')}
-function editGrammar(id){let x=state.grammarLectures.find(x=>x.id===id);if(!x)return;let n=prompt('Lecture / topic name:',x.name);if(n===null)return;let notes=prompt('Notes / doubts:',x.notes||'');if(notes===null)return;x.name=n.trim()||x.name;x.notes=notes;save();renderGrammarLectures();toast('Grammar lecture saved')}
-$('editorialForm').addEventListener('submit',e=>{e.preventDefault();state.editorials.push({id:'ed'+Date.now(),date:$('editorialDate').value,source:$('editorialSource').value,minutes:+$('editorialTime').value,headline:$('editorialHeadline').value.trim(),summary:$('editorialSummary').value.trim(),vocab:$('editorialVocab').value.trim(),notes:$('editorialNotes').value.trim()});recordStudyDay();save();$('editorialForm').reset();$('editorialDate').value=today();$('editorialTime').value=20;renderEditorials();toast('Editorial log saved')});
-function renderEditorials(){if(!$('editorialHistory'))return;let a=[...state.editorials].sort((x,y)=>y.date.localeCompare(x.date));$('editorialHistory').innerHTML=a.length?a.map(x=>`<div class="due-item"><div><strong>${esc(x.headline)}</strong><div class="small">${x.date} • ${esc(x.source||'Source not set')} • ${x.minutes} min</div>${x.summary?`<div class="small">${esc(x.summary)}</div>`:''}${x.vocab?`<div class="small">Vocabulary: ${esc(x.vocab)}</div>`:''}</div><button class="btn danger tiny" onclick="deleteEditorial('${x.id}')">Delete</button></div>`).join(''):'<div class="empty">No editorial logged yet. Add today\'s reading above.</div>'}
-function deleteEditorial(id){if(!confirm('Delete this editorial log?'))return;state.editorials=state.editorials.filter(x=>x.id!==id);save();renderEditorials()}
-$('todoForm').addEventListener('submit',e=>{e.preventDefault();state.todos.push({id:'td'+Date.now(),text:$('todoText').value.trim(),date:$('todoDate').value,priority:$('todoPriority').value,category:$('todoCategory').value,done:false});save();$('todoText').value='';renderTodos();toast('Task added')});
-function addDailyTemplate(){let tasks=[['Read one editorial','Editorial'],['Revise due topics','Revision'],['Quant practice','Quant'],['Reasoning practice','Reasoning']];tasks.forEach((x,i)=>state.todos.push({id:'td'+Date.now()+i,text:x[0],date:today(),priority:'High',category:x[1],done:false}));save();renderTodos();toast('Daily routine added')}
-function renderTodos(){if(!$('todoList'))return;let f=$('todoFilter')?.value||'Open',a=[...state.todos].sort((x,y)=>x.date.localeCompare(y.date)).filter(x=>f==='All'||(f==='Done'?x.done:!x.done));$('todoList').innerHTML=a.length?a.map(x=>`<div class="due-item"><div><label class="checkline"><input type="checkbox" ${x.done?'checked':''} onchange="toggleTodo('${x.id}',this.checked)"> <strong style="${x.done?'text-decoration:line-through;opacity:.6':''}">${esc(x.text)}</strong></label><div class="small">${x.date} • ${esc(x.category)} • ${esc(x.priority)} priority ${x.date<today()&&!x.done?'<span class="overdue">• overdue</span>':''}</div></div><button class="btn danger tiny" onclick="deleteTodo('${x.id}')">Delete</button></div>`).join(''):'<div class="empty">No tasks in this view. Add one above.</div>'}
-function toggleTodo(id,done){let x=state.todos.find(x=>x.id===id);if(!x)return;x.done=done;if(done)recordStudyDay();save();renderTodos()}
-function deleteTodo(id){state.todos=state.todos.filter(x=>x.id!==id);save();renderTodos()}
-$('examForm').addEventListener('submit',e=>{e.preventDefault();state.exams.push({id:'ex'+Date.now(),name:$('examName').value.trim(),date:$('examDate').value,status:$('examStatus').value,stage:$('examStage').value,notes:$('examNotes').value.trim()});save();$('examForm').reset();renderExams();toast('Exam date saved')});
-function renderExams(){if(!$('examList'))return;let a=[...state.exams].sort((x,y)=>x.date.localeCompare(y.date));$('examList').innerHTML=a.length?a.map(x=>{let days=Math.ceil((new Date(x.date+'T23:59:59')-new Date())/86400000);return `<div class="due-item"><div style="flex:1;min-width:0"><strong>${esc(x.name)} — ${esc(x.stage)}</strong><div class="small">${x.date} • ${esc(x.status)} • ${days>=0?days+' days to go':Math.abs(days)+' days ago'}</div><div class="stat-value cyan" style="font-size:18px;margin:5px 0" data-exam-countdown="${esc(x.date)}">Loading countdown…</div>${x.notes?`<div class="small">${esc(x.notes)}</div>`:''}</div><button class="btn danger tiny" onclick="deleteExam('${x.id}')">Delete</button></div>`}).join(''):'<div class="empty">Add your target exams and notification deadlines here.</div>';updateCountdowns()}
-function deleteExam(id){state.exams=state.exams.filter(x=>x.id!==id);save();renderExams()}
+  const { error } = await cloudClient
+    .from("planner_data")
+    .upsert({
+      user_id: cloudUser.id,
+      data: state,
+      updated_at: new Date().toISOString()
+    });
 
-function showTopicForm(t){$('topicFormCard').style.display='block';$('topicFormTitle').textContent=t?'Edit topic':'Add a topic';$('topicId').value=t?.id||'';$('topicSubject').value=t?.subject||'Quant';$('topicName').value=t?.name||'';$('topicPriority').value=t?.priority||'Medium';$('topicLearn').value=t?.learn??0;$('topicPractice').value=t?.practice??0;$('topicPyq').value=t?.pyq??0;$('topicNextRevision').value=t?.nextRevision||'';$('topicQuestions').value=t?.questions||0;$('topicAccuracy').value=t?.accuracy??'';$('topicNotes').value=t?.notes||'';$('topicFormCard').scrollIntoView({behavior:'smooth',block:'start'})}
-function hideTopicForm(){$('topicFormCard').style.display='none';$('topicForm').reset()}
-$('topicForm').addEventListener('submit',e=>{e.preventDefault();let id=$('topicId').value;let t={id:id||'t'+Date.now(),subject:$('topicSubject').value,name:$('topicName').value.trim(),priority:$('topicPriority').value,learn:+$('topicLearn').value,practice:+$('topicPractice').value,pyq:+$('topicPyq').value,nextRevision:$('topicNextRevision').value,questions:+$('topicQuestions').value,accuracy:$('topicAccuracy').value===''?'':Math.min(100,Math.max(0,+$('topicAccuracy').value)),notes:$('topicNotes').value.trim(),created:today()};if(id)state.topics=state.topics.map(x=>x.id===id?t:x);else state.topics.push(t);save();hideTopicForm();renderAll();toast('Topic saved')});
-function renderTopics(){let q=($('topicSearch')?.value||'').toLowerCase(),sf=$('subjectFilter')?.value||'All',st=$('statusFilter')?.value||'All';let ts=state.topics.filter(t=>(sf==='All'||t.subject===sf)&&(st==='All'||topicStatus(t)===st)&&(`${t.name} ${t.subject} ${t.notes}`.toLowerCase().includes(q)));$('topicList').innerHTML=ts.map(t=>`<article class="topic"><div><h3>${esc(t.name)}</h3><div class="topic-meta"><span class="tag">${esc(t.subject)}</span><span class="tag ${t.priority==='High'?'':' ' }">${esc(t.priority)} priority</span><span class="tag ${topicStatus(t)==='Completed'?'done':topicStatus(t)==='Ready for revision'?'progress-tag':''}">${topicStatus(t)}</span><span class="tag">${percent(t)}% steps</span>${t.nextRevision?`<span class="tag">${t.nextRevision<=today()?'Revision due':'Revise'}: ${t.nextRevision}</span>`:''}</div><div class="progress" style="max-width:420px"><div style="width:${percent(t)}%"></div></div><div class="small">Learn: ${stepName(t.learn)} • Practice: ${stepName(t.practice)} • PYQs: ${stepName(t.pyq)} • ${t.questions||0} questions${t.accuracy!==''?' • '+t.accuracy+'% accuracy':''}${t.revisionCount?' • reviewed '+t.revisionCount+'×':''}</div>${t.notes?`<div class="small" style="margin-top:5px">Notes: ${esc(t.notes)}</div>`:''}</div><div class="topic-actions"><button class="btn secondary tiny" onclick="quickStep('${t.id}','learn')">Learn</button><button class="btn secondary tiny" onclick="quickStep('${t.id}','practice')">Practice</button><button class="btn secondary tiny" onclick="quickStep('${t.id}','pyq')">PYQs</button><button class="btn tiny" onclick="showTopicForm(state.topics.find(x=>x.id==='${t.id}'))">Edit</button><button class="btn secondary tiny" onclick="revise('${t.id}')">Revise</button><button class="btn danger tiny" onclick="deleteTopic('${t.id}')">×</button></div></article>`).join('')||'<div class="empty">No topics match these filters.</div>'}
-function stepName(v){return ['Not started','In progress','Done'][+v||0]}
-function quickStep(id,key){let t=state.topics.find(x=>x.id===id);if(!t)return;t[key]=((+t[key]||0)+1)%3;if(t.learn===2&&t.practice===2&&!t.nextRevision)t.nextRevision=addDays(today(),1);save();renderAll();toast(key==='pyq'?'PYQs status updated':key+' status updated')}
-function deleteTopic(id){if(!confirm('Delete this topic and its revision tracking?'))return;state.topics=state.topics.filter(t=>t.id!==id);save();renderAll();toast('Topic deleted')}
-$('testForm').addEventListener('submit',e=>{e.preventDefault();let t={id:'test'+Date.now(),date:$('testDate').value,name:$('testName').value.trim(),type:$('testType').value,subject:$('testSubject').value,score:+$('testScore').value,max:+$('testMax').value,attempted:+$('testAttempted').value,correct:+$('testCorrect').value,time:$('testTime').value,notes:$('testNotes').value.trim()};if(t.correct>t.attempted){toast('Correct answers cannot exceed attempted questions');return}if(t.score>t.max){toast('Score cannot exceed maximum marks');return}state.tests.push(t);save();$('testForm').reset();$('testDate').value=today();if($('editorialDate'))$('editorialDate').value=today();if($('todoDate'))$('todoDate').value=today();renderAll();toast('Test result saved')});
-function renderTests(){let ts=[...state.tests].sort((a,b)=>b.date.localeCompare(a.date));$('testHistory').innerHTML=ts.length?`<table><thead><tr><th>Date / test</th><th>Type / subject</th><th>Score</th><th>Attempted</th><th>Accuracy</th><th>Time</th><th>Action</th></tr></thead><tbody>${ts.map(t=>`<tr><td><strong>${esc(t.name)}</strong><div class="small">${esc(t.date)}</div>${t.notes?`<div class="small">${esc(t.notes)}</div>`:''}</td><td>${esc(t.type)}<div class="small">${esc(t.subject)}</div></td><td><strong>${t.score}/${t.max}</strong><div class="small">${t.max?Math.round(t.score/t.max*100):0}% marks</div></td><td>${t.attempted} <span class="small">(${t.correct} correct)</span></td><td>${t.attempted?Math.round(t.correct/t.attempted*100)+'%':'—'}</td><td>${t.time?t.time+' min':'—'}</td><td><button class="btn danger tiny" onclick="deleteTest('${t.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No tests logged yet. Add your first topic test or mock above.</div>'}
-function deleteTest(id){if(!confirm('Delete this test result?'))return;state.tests=state.tests.filter(t=>t.id!==id);save();renderAll();toast('Test deleted')}
-function dueTopics(){return state.topics.filter(t=>t.nextRevision&&t.nextRevision<=today()).sort((a,b)=>a.nextRevision.localeCompare(b.nextRevision))}
-function renderRevision(){let due=state.topics.filter(t=>t.nextRevision).sort((a,b)=>a.nextRevision.localeCompare(b.nextRevision)),over=due.filter(t=>t.nextRevision<today()).length,td=due.filter(t=>t.nextRevision===today()).length,up=due.filter(t=>t.nextRevision>today()).length;$('revOverdue').textContent=over;$('revToday').textContent=td;$('revUpcoming').textContent=up;$('revSessions').textContent=state.revisions.length;
- $('revisionList').innerHTML=due.length?due.map(t=>`<div class="due-item"><div><strong>${esc(t.name)}</strong><div class="small">${esc(t.subject)} • ${t.nextRevision<today()?'<span class="overdue">Overdue</span>':t.nextRevision===today()?'<span class="today">Due today</span>':'Upcoming'} • ${t.nextRevision}</div>${t.notes?`<div class="small">${esc(t.notes)}</div>`:''}</div><div class="actions"><span class="tag">1 → 3 → 7 → 15 days</span><button class="btn tiny" onclick="revise('${t.id}')">Review done ✓</button></div></div>`).join(''):'<div class="empty">No revision dates set yet. Add a next revision date from the Syllabus tab.</div>';
- let hist=[...state.revisions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,20);$('revisionHistory').innerHTML=hist.length?`<div class="table-wrap"><table><thead><tr><th>Date revised</th><th>Topic</th><th>Subject</th><th>Recall</th><th>Next revision</th></tr></thead><tbody>${hist.map(r=>`<tr><td>${r.date}</td><td><strong>${esc(r.name)}</strong></td><td>${esc(r.subject)}</td><td>${esc(r.rating||'—')} (${r.interval||'—'}d)</td><td>${r.nextDate||'Not scheduled'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Completed revision sessions will appear here.</div>'}
-function revise(id){
- let t=state.topics.find(x=>x.id===id);if(!t)return;
- let previousCount=+t.revisionCount||0;
- // The topic's first due date is set to Day 1 manually. Completing that review schedules Day 3, then Day 7, Day 15, and repeats every 15 days.
- let cycle=[3,7,15,15];
- let days=cycle[Math.min(previousCount,cycle.length-1)];
- let rating='1-3-7-15 cycle';
- t.revisionInterval=days;t.revisionCount=previousCount+1;t.lastReviewed=today();t.nextRevision=addDays(today(),days);
- state.revisions.push({id:'r'+Date.now(),topicId:id,name:t.name,subject:t.subject,date:today(),nextDate:t.nextRevision,rating:rating,interval:days});
- save();renderAll();toast(`Revision saved • next review in ${days} day(s)`);
+  if (error) throw error;
+  cloudStatus("Cloud saved at " + new Date().toLocaleTimeString());
 }
-function addDays(d,n){let x=new Date(d+'T12:00:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function download(name,content,type){let a=document.createElement('a'),blob=new Blob([content],{type});a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href)}
-function exportJSON(){download('bank-prep-tracker-backup-'+today()+'.json',JSON.stringify(state,null,2),'application/json')}
-function csv(rows){return rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n')}
-function exportCSV(kind){let rows;if(kind==='topics'){rows=[['Subject','Topic','Priority','Learn','Practice','PYQs','Status','Questions solved','Accuracy','Next revision','Notes'],...state.topics.map(t=>[t.subject,t.name,t.priority,stepName(t.learn),stepName(t.practice),stepName(t.pyq),topicStatus(t),t.questions,t.accuracy,t.nextRevision,t.notes])];download('syllabus-tracker.csv',csv(rows),'text/csv')}else{rows=[['Date','Test name','Type','Subject','Score','Maximum','Attempted','Correct','Accuracy %','Time minutes','Notes'],...state.tests.map(t=>[t.date,t.name,t.type,t.subject,t.score,t.max,t.attempted,t.correct,t.attempted?Math.round(t.correct/t.attempted*100):'',t.time,t.notes])];download('test-history.csv',csv(rows),'text/csv')}}
-function importJSON(){let f=$('importFile').files[0];if(!f){toast('Choose a backup JSON file first');return}let r=new FileReader();r.onload=()=>{try{let s=JSON.parse(r.result);if(!Array.isArray(s.topics)||!Array.isArray(s.tests)||!Array.isArray(s.revisions))throw Error();if(!confirm('Importing will replace current tracker data. Continue?'))return;state=s;save();load();toast('Backup restored')}catch(e){toast('Invalid backup file')}};r.readAsText(f)}
-function clearAll(){if(!confirm('Are you sure? This will permanently clear all syllabus, test and revision data in this browser.'))return;if(!confirm('Final confirmation: clear all tracker data?'))return;localStorage.removeItem(KEY);state={topics:[],tests:[],revisions:[],lectures:[],reasoningLectures:[],englishLectures:[],gkLectures:[],grammarLectures:[],editorials:[],todos:[],exams:[],studyDays:[],studySessions:[],studyTimer:{elapsed:0,runningSince:null,subject:'Quant'},dailyDate:today(),daily:{}};load();toast('Tracker reset')}
-load();
-</script>
-</body>
-</html>
+
+function scheduleCloudSave() {
+  if (!cloudReady || !cloudClient || !cloudUser) return;
+
+  clearTimeout(cloudTimer);
+  cloudTimer = setTimeout(async () => {
+    try {
+      await cloudSaveNow();
+    } catch (error) {
+      cloudStatus("Cloud save failed: " + error.message);
+    }
+  }, 1200);
+}
+
+async function cloudLogout() {
+  if (cloudClient) await cloudClient.auth.signOut();
+
+  cloudUser = null;
+  cloudReady = false;
+  cloudStatus("Logged out. Local saving remains available.");
+}
+
+function loadCloudSettings() {
+  const saved = JSON.parse(
+    localStorage.getItem(CLOUD_CONFIG_KEY) || "null"
+  );
+
+  if (!saved || !window.supabase) return;
+
+  cloudClient = window.supabase.createClient(
+    saved.url,
+    saved.key
+  );
+}
